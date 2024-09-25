@@ -2,14 +2,14 @@ eureka:
   client:
     register-with-eureka: true
     service-url:
-      defaultZone: http://192.168.1.70:9701/eureka/
+      defaultZone:
     fetch-registry: true
   instance:
     prefer-ip-address: true
 spring:
   datasource:
     druid:
-      url: jdbc:mysql://192.168.1.165:3306/ssdl?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull
+      url:
       username: ssdl
       password: ssdl@0518
       initial-size: 1
