@@ -1,0 +1,337 @@
+.
+├── HELP.md
+├── mission-center-common
+│   ├── mission-center-common.iml
+│   ├── pom.xml
+│   └── src
+│       ├── main
+│       │   └── java
+│       │       └── com
+│       │           └── mission
+│       │               └── center
+│       │                   ├── annotation
+│       │                   │   ├── ApiEnumProperty.java
+│       │                   │   └── EnumModelPropertyBuilderPlugin.java
+│       │                   ├── constant
+│       │                   │   ├── ExportTemplateType.java
+│       │                   │   ├── IeTaskState.java
+│       │                   │   ├── IeTaskType.java
+│       │                   │   └── ServiceModelEnum.java
+│       │                   ├── constants
+│       │                   │   └── Constants.java
+│       │                   ├── entity
+│       │                   │   └── BaseResponse.java
+│       │                   ├── error
+│       │                   │   ├── GlobalExceptionHandler.java
+│       │                   │   ├── ServerCode.java
+│       │                   │   └── ServiceException.java
+│       │                   ├── excel
+│       │                   │   ├── ExcelBean.java
+│       │                   │   ├── ExcelCommonExports.java
+│       │                   │   ├── ExcelDynamicExports.java
+│       │                   │   ├── ExcelExports.java
+│       │                   │   ├── ExcelGenProperty.java
+│       │                   │   ├── FileSuffixEnum.java
+│       │                   │   ├── PoiMergeCellUtil.java
+│       │                   │   ├── SheetBean.java
+│       │                   │   ├── annotations
+│       │                   │   │   └── McExcelProperty.java
+│       │                   │   └── bean
+│       │                   │       └── ExcelFiled.java
+│       │                   ├── serializer
+│       │                   │   ├── CommonEnumDeserializer.java
+│       │                   │   ├── EnumKeySerializer.java
+│       │                   │   ├── EnumValueSerializer.java
+│       │                   │   ├── IeTaskStateDeserializer.java
+│       │                   │   └── IeTaskTypeDeserializer.java
+│       │                   └── util
+│       │                       ├── CodeUtil.java
+│       │                       ├── CommCollectionUtils.java
+│       │                       ├── GenericUtils.java
+│       │                       ├── Page.java
+│       │                       ├── PageTotal.java
+│       │                       ├── PageUtil.java
+│       │                       ├── Pair.java
+│       │                       ├── ReflectionUtils.java
+│       │                       ├── SpringContextUtil.java
+│       │                       └── ValidationUtils.java
+│       └── test
+│           └── java
+│               └── com
+│                   └── mission
+│                       └── center
+│                           └── MissionCenterCommonApplicationTests.java
+├── mission-center-core
+│   ├── mission-center-core.iml
+│   ├── pom.xml
+│   └── src
+│       ├── main
+│       │   ├── java
+│       │   │   └── com
+│       │   │       └── mission
+│       │   │           └── center
+│       │   │               └── core
+│       │   │                   ├── annotations
+│       │   │                   ├── bean
+│       │   │                   │   ├── DownloaderRequestContext.java
+│       │   │                   │   └── DynamicsReportFields.java
+│       │   │                   ├── confing
+│       │   │                   │   ├── BeanConfing.java
+│       │   │                   │   └── SystemAspect.java
+│       │   │                   ├── enu
+│       │   │                   ├── executor
+│       │   │                   │   ├── excel
+│       │   │                   │   │   ├── ExcelIntensifier.java
+│       │   │                   │   │   ├── ExcelIntensifierExecutor.java
+│       │   │                   │   │   └── IeDownloadExecutor.java
+│       │   │                   │   └── task
+│       │   │                   ├── file
+│       │   │                   │   ├── FileService.java
+│       │   │                   │   └── OSSClientUtil.java
+│       │   │                   ├── intercept
+│       │   │                   ├── metrics
+│       │   │                   ├── property
+│       │   │                   ├── task
+│       │   │                   │   └── IIeTaskService.java
+│       │   │                   ├── template
+│       │   │                   │   ├── IExportTemplate.java
+│       │   │                   │   └── impl
+│       │   │                   │       ├── AbstractIeDownloadTemplate.java
+│       │   │                   │       └── PageShardingDownloadTemplate.java
+│       │   │                   ├── thread
+│       │   │                   │   ├── CustomDiscardPolicy.java
+│       │   │                   │   └── ThreadPoolConfig.java
+│       │   │                   └── utils
+│       │   │                       ├── ExcelBeanUtils.java
+│       │   │                       └── GenerateDynamicsReportFieldsClassUtils.java
+│       │   └── resources
+│       └── test
+│           └── java
+│               └── com
+│                   └── mission
+│                       └── center
+│                           └── core
+│                               └── MissionCenterCoreApplicationTests.java
+├── mission-center-server
+│   ├── pom.xml
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── mission
+│   │   │   │           └── center
+│   │   │   │               └── server
+│   │   │   │                   ├── MissionCenterServerApplication.java
+│   │   │   │                   ├── config
+│   │   │   │                   │   └── FastjsonConfig.java
+│   │   │   │                   ├── controller
+│   │   │   │                   │   ├── IeTaskController.java
+│   │   │   │                   │   └── IeTemplateController.java
+│   │   │   │                   ├── convert
+│   │   │   │                   │   └── McIeTaskConvert.java
+│   │   │   │                   ├── entity
+│   │   │   │                   │   ├── McIeServiceModuleConfig.java
+│   │   │   │                   │   └── McIeTask.java
+│   │   │   │                   ├── executor
+│   │   │   │                   │   └── TaskExecutor.java
+│   │   │   │                   ├── export
+│   │   │   │                   ├── feign
+│   │   │   │                   │   ├── DynamicsReportFeign.java
+│   │   │   │                   │   └── vo
+│   │   │   │                   │       ├── DynamicsReportCountResponse.java
+│   │   │   │                   │       ├── DynamicsReportFieldsResponse.java
+│   │   │   │                   │       ├── DynamicsReportQueryRequest.java
+│   │   │   │                   │       ├── DynamicsReportQueryResponse.java
+│   │   │   │                   │       └── DynamicsReportQuerySearchField.java
+│   │   │   │                   ├── mapper
+│   │   │   │                   │   └── McIeTaskMapper.java
+│   │   │   │                   ├── notify
+│   │   │   │                   ├── service
+│   │   │   │                   │   ├── IeTaskService.java
+│   │   │   │                   │   └── IeTemplateService.java
+│   │   │   │                   ├── template
+│   │   │   │                   │   └── DynamicExportTemplate.java
+│   │   │   │                   ├── util
+│   │   │   │                   │   └── CodeUtilBean.java
+│   │   │   │                   ├── vo
+│   │   │   │                   │   ├── BasePageRequest.java
+│   │   │   │                   │   ├── BaseRequest.java
+│   │   │   │                   │   ├── IeTaskAddRequest.java
+│   │   │   │                   │   ├── IeTaskListRequest.java
+│   │   │   │                   │   ├── IeTaskListResponse.java
+│   │   │   │                   │   ├── IeTaskTemplateListRequest.java
+│   │   │   │                   │   ├── IeTaskTemplateRequest.java
+│   │   │   │                   │   └── IeTaskTemplateResponse.java
+│   │   │   │                   └── xxljob
+│   │   │   │                       └── IeTaskJob.java
+│   │   │   └── resources
+│   │   │       ├── application-dev.yml
+│   │   │       ├── application-prod.yml
+│   │   │       ├── application.yml
+│   │   │       └── mapper
+│   │   │           └── McIeTaskMapper.xml
+│   │   └── test
+│   │       └── java
+│   │           └── com
+│   │               └── mission
+│   │                   └── center
+│   │                       └── server
+│   │                           └── MissionCenterServerApplicationTests.java
+│   └── target
+│       ├── classes
+│       │   ├── application-dev.yml
+│       │   ├── application-prod.yml
+│       │   ├── application.yml
+│       │   ├── com
+│       │   │   └── mission
+│       │   │       └── center
+│       │   │           └── server
+│       │   │               ├── MissionCenterServerApplication.class
+│       │   │               ├── config
+│       │   │               │   └── FastjsonConfig.class
+│       │   │               ├── controller
+│       │   │               │   ├── IeTaskController.class
+│       │   │               │   └── IeTemplateController.class
+│       │   │               ├── convert
+│       │   │               │   ├── McIeTaskConvert.class
+│       │   │               │   └── McIeTaskConvertImpl.class
+│       │   │               ├── entity
+│       │   │               │   ├── McIeServiceModuleConfig.class
+│       │   │               │   └── McIeTask.class
+│       │   │               ├── executor
+│       │   │               │   └── TaskExecutor.class
+│       │   │               ├── feign
+│       │   │               │   ├── DynamicsReportFeign.class
+│       │   │               │   └── vo
+│       │   │               │       ├── DynamicsReportCountResponse.class
+│       │   │               │       ├── DynamicsReportFieldsResponse.class
+│       │   │               │       ├── DynamicsReportQueryRequest.class
+│       │   │               │       ├── DynamicsReportQueryResponse.class
+│       │   │               │       ├── DynamicsReportQuerySearchField$DynamicsReportQuerySearchFieldBuilder.class
+│       │   │               │       └── DynamicsReportQuerySearchField.class
+│       │   │               ├── mapper
+│       │   │               │   └── McIeTaskMapper.class
+│       │   │               ├── service
+│       │   │               │   ├── IeTaskService.class
+│       │   │               │   └── IeTemplateService.class
+│       │   │               ├── template
+│       │   │               │   └── DynamicExportTemplate.class
+│       │   │               ├── util
+│       │   │               │   └── CodeUtilBean.class
+│       │   │               ├── vo
+│       │   │               │   ├── BasePageRequest.class
+│       │   │               │   ├── BaseRequest.class
+│       │   │               │   ├── IeTaskAddRequest.class
+│       │   │               │   ├── IeTaskListRequest.class
+│       │   │               │   ├── IeTaskListResponse.class
+│       │   │               │   ├── IeTaskTemplateListRequest.class
+│       │   │               │   ├── IeTaskTemplateRequest.class
+│       │   │               │   ├── IeTaskTemplateResponse$IeTaskTemplateResponseBuilder.class
+│       │   │               │   └── IeTaskTemplateResponse.class
+│       │   │               └── xxljob
+│       │   │                   └── IeTaskJob.class
+│       │   └── mapper
+│       │       └── McIeTaskMapper.xml
+│       └── generated-sources
+│           └── annotations
+│               └── com
+│                   └── mission
+│                       └── center
+│                           └── server
+│                               └── convert
+│                                   └── McIeTaskConvertImpl.java
+├── mvnw
+├── mvnw.cmd
+├── out
+│   └── production
+│       ├── mission-center-common
+│       │   ├── com
+│       │   │   └── mission
+│       │   │       └── center
+│       │   │           ├── annotation
+│       │   │           │   ├── ApiEnumProperty.class
+│       │   │           │   └── EnumModelPropertyBuilderPlugin.class
+│       │   │           ├── constant
+│       │   │           │   ├── ExportTemplateType.class
+│       │   │           │   ├── IeTaskState.class
+│       │   │           │   ├── IeTaskType.class
+│       │   │           │   └── ServiceModelEnum.class
+│       │   │           ├── constants
+│       │   │           │   └── Constants.class
+│       │   │           ├── entity
+│       │   │           │   ├── BaseResponse$BaseResponseBuilder.class
+│       │   │           │   └── BaseResponse.class
+│       │   │           ├── error
+│       │   │           │   ├── GlobalExceptionHandler.class
+│       │   │           │   ├── ServerCode.class
+│       │   │           │   └── ServiceException.class
+│       │   │           ├── excel
+│       │   │           │   ├── ExcelBean.class
+│       │   │           │   ├── ExcelCommonExports.class
+│       │   │           │   ├── ExcelDynamicExports.class
+│       │   │           │   ├── ExcelExports.class
+│       │   │           │   ├── ExcelGenProperty.class
+│       │   │           │   ├── FileSuffixEnum.class
+│       │   │           │   ├── PoiMergeCellUtil.class
+│       │   │           │   ├── SheetBean.class
+│       │   │           │   ├── annotations
+│       │   │           │   │   └── McExcelProperty.class
+│       │   │           │   └── bean
+│       │   │           │       └── ExcelFiled.class
+│       │   │           ├── serializer
+│       │   │           │   ├── CommonEnumDeserializer.class
+│       │   │           │   ├── EnumKeySerializer.class
+│       │   │           │   ├── EnumValueSerializer.class
+│       │   │           │   ├── IeTaskStateDeserializer.class
+│       │   │           │   └── IeTaskTypeDeserializer.class
+│       │   │           └── util
+│       │   │               ├── CodeUtil.class
+│       │   │               ├── CommCollectionUtils.class
+│       │   │               ├── GenericUtils.class
+│       │   │               ├── Page.class
+│       │   │               ├── PageTotal.class
+│       │   │               ├── PageUtil.class
+│       │   │               ├── Pair.class
+│       │   │               ├── ReflectionUtils.class
+│       │   │               ├── SpringContextUtil.class
+│       │   │               └── ValidationUtils.class
+│       │   └── generated
+│       └── mission-center-core
+│           ├── com
+│           │   └── mission
+│           │       └── center
+│           │           └── core
+│           │               ├── bean
+│           │               │   ├── DownloaderRequestContext.class
+│           │               │   ├── DynamicsReportFields$DynamicsReportFieldsBuilder.class
+│           │               │   └── DynamicsReportFields.class
+│           │               ├── confing
+│           │               │   ├── BeanConfing.class
+│           │               │   └── SystemAspect.class
+│           │               ├── executor
+│           │               │   └── excel
+│           │               │       ├── ExcelIntensifier.class
+│           │               │       ├── ExcelIntensifierExecutor.class
+│           │               │       └── IeDownloadExecutor.class
+│           │               ├── file
+│           │               │   ├── FileService.class
+│           │               │   └── OSSClientUtil.class
+│           │               ├── task
+│           │               │   └── IIeTaskService.class
+│           │               ├── template
+│           │               │   ├── IExportTemplate.class
+│           │               │   └── impl
+│           │               │       ├── AbstractIeDownloadTemplate$1.class
+│           │               │       ├── AbstractIeDownloadTemplate.class
+│           │               │       └── PageShardingDownloadTemplate.class
+│           │               ├── thread
+│           │               │   ├── CustomDiscardPolicy.class
+│           │               │   └── ThreadPoolConfig.class
+│           │               └── utils
+│           │                   ├── ExcelBeanUtils.class
+│           │                   └── GenerateDynamicsReportFieldsClassUtils.class
+│           └── generated
+├── pom.xml
+└── project_structure.txt
+
+144 directories, 190 files

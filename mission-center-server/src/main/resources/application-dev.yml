@@ -1,0 +1,49 @@
+eureka:
+  client:
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://192.168.1.70:9701/eureka/
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+spring:
+  datasource:
+    druid:
+      url: jdbc:mysql://192.168.1.165:3306/ssdl?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull
+      username: ssdl
+      password: ssdl@0518
+      initial-size: 1
+      max-active: 50
+      min-idle: 1
+      max-wait: 60000
+      # 间隔多久进行一次检测，检测需要关闭的空闲连接 单位毫秒
+      time-between-eviction-runs-millis: 30000
+      # 连接在池中最小生存的时间
+      min-evictable-idle-time-millis: 60000
+      # 合并多个DruidDataSource的监控数据
+      use-global-data-source-stat: true
+      stat-view-servlet:
+        login-username: admin
+        login-password: admin&zaq9
+        allow: false
+    driver: com.mysql.jdbc.Driver
+
+oss:
+  endpoint:
+  accessKeyId:
+  accessKeySecret:
+  bucketName:
+  apkBucketName:
+  filedir: ie
+
+ssdl:
+  xxl:
+    job:
+      admin-addresses:
+      accessToken: default_token
+      executor-appname: ${spring.application.name}
+      executor-address:
+      executor-ip:
+      executor-port: 0
+      executor-logpath: /mnt/home/ssdl/temp
+      executor-logretentiondays: 30

@@ -1,0 +1,48 @@
+server:
+  port: 8080
+  servlet:
+    context-path: mc
+spring:
+  application:
+    name: mission-center-server
+
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 100000
+  ConnectTimeout: 100000
+  MaxAutoRetries: 1
+  MaxAutoRetriesNextServer: 2
+  OkToRetryOnAllOperations: true
+
+ie:
+  taskThreadPool:
+    core: 3
+    max: 10
+    time: 60
+task:
+  ie:
+    shardingSize: 1000
+  cleanse:
+    shardingSize: 50
+file:
+  root-path: temp
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  typeAliasesPackage: com.mission.center.server.entity
+  global-config:
+    db-config:
+      update-strategy: not_null
+      insert-strategy: not_empty
+      id-type: AUTO
+      #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+      field-strategy: 2
+      #驼峰下划线转换
+      db-column-underline: true
+      #逻辑删除配置（下面3个配置）
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开发测试环境打开SQL日志方便排查问题
