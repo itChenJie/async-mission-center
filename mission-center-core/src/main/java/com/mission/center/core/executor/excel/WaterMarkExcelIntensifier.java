@@ -1,6 +1,7 @@
 package com.mission.center.core.executor.excel;
 
 import com.mission.center.core.bean.TaskRequestContext;
+import com.mission.center.error.ServiceException;
 import com.mission.center.excel.WaterMarkExcelUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -39,7 +40,7 @@ public class WaterMarkExcelIntensifier implements ExcelIntensifier {
                 log.error("[WaterMarkExcelIntensifier#enhance]", e);
             }
         } else {
-            throw new RuntimeException("this workbook not support watermark!");
+            throw new ServiceException("this workbook not support watermark!");
         }
     }
 }

@@ -13,6 +13,7 @@ import java.util.concurrent.Executor;
 public class AsyncConfig {
     @Value("${ie.taskThreadPool.max}")
     private int max;
+
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

@@ -40,7 +40,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 导出导入任务中心
+ * @Description: 导出导入任务中心
+ * @Author: chenWenJie
  */
 @Service
 @RequiredArgsConstructor
@@ -85,10 +86,11 @@ public class IeTaskService implements IIeTaskService {
         if (!request.isDelayExecution()){
             ieTask.setExecutionTime(new Date());
         }else {
-            ieTask.setExecutionTime(iExportTemplate.executionTime());
+            ieTask.setExecutionTime(iExportTemplate.executionTime(true));
         }
         ieTask.setExecutionSection(iExportTemplate.executionSection());
         ieTask.setState(IeTaskState.WAIT_START);
+        ieTask.setCurrentPage(0);
         mcIeTaskMapper.insert(ieTask);
         asyncTaskService.execute(ieTask);
         IeTaskListBean taskListBean = new IeTaskListBean();
@@ -105,7 +107,7 @@ public class IeTaskService implements IIeTaskService {
 
         if (iExportTemplate.taskType()== IeTaskType.IMPORT){
             Assert.isFalse(StringUtils.isBlank(request.getFileName())||StringUtils.isBlank(request.getImportFileKey())
-            ,()-> new ServiceException("导入文件名、文件地址不能为空！"));
+                    ,()-> new ServiceException("导入文件名、文件地址不能为空！"));
             Assert.isFalse(StringUtils.isBlank(request.getDetailsUrl()),()-> new ServiceException("数据详情列表页面路由地址不能为空！"));
         }else if(iExportTemplate.taskType()== IeTaskType.CLEANSE){
             Assert.isFalse(StringUtils.isBlank(request.getDetailsUrl()),()-> new ServiceException("数据详情列表页面路由地址不能为空！"));
@@ -123,10 +125,10 @@ public class IeTaskService implements IIeTaskService {
         Page<McIeTask> page = PageDTO.of(request.getPage(),request.getPageSize());
         LambdaUpdateWrapper<McIeTask> wrapper = new LambdaUpdateWrapper<McIeTask>()
                 .eq(!StringUtils.isBlank(request.getCode()), McIeTask::getCode, request.getCode())
-                .eq(!ObjectUtil.isEmpty(request.getModuleCode()), McIeTask::getModuleCode, request.getModuleCode())
+                .eq(!ObjectUtil.isNull(request.getModuleCode()), McIeTask::getModuleCode, request.getModuleCode())
                 .eq(!StringUtils.isBlank(request.getMenuCode()), McIeTask::getMenuCode, request.getMenuCode())
                 .eq(!StringUtils.isBlank(request.getTemplateCode()), McIeTask::getTemplateCode, request.getTemplateCode())
-                .in(!ObjectUtil.isEmpty(request.getTypes()), McIeTask::getType, request.getTypes())
+                .in(!ObjectUtil.isNull(request.getTypes()), McIeTask::getType, request.getTypes())
                 .eq(!StringUtils.isBlank(request.getServiceModelUserId()), McIeTask::getServiceModelUserId, request.getServiceModelUserId())
                 .eq(!StringUtils.isBlank(request.getChannelCode()), McIeTask::getChannelCode, request.getChannelCode())
                 .between(!StringUtils.isBlank(request.getStartTime()) && !StringUtils.isBlank(request.getEndTime()), McIeTask::getCreateTime
@@ -141,7 +143,7 @@ public class IeTaskService implements IIeTaskService {
             }
         }
         Page<McIeTask> taskPage = mcIeTaskMapper.selectPage(page, wrapper);
-        if (ObjectUtil.isEmpty(taskPage.getRecords()))
+        if (ObjectUtil.isNull(taskPage.getRecords()))
             return response;
 
         response.setTaskList(BeanCopyUtils.copyBeanList(taskPage.getRecords(), IeTaskListBean.class));
@@ -198,13 +200,15 @@ public class IeTaskService implements IIeTaskService {
      * @param code     任务编码
      * @param schedule 进度
      * @param currentPage
+     * @param currentPageInIndex 当前分页内下标
      * @return
      */
     @Override
-    public boolean updateSchedule(String code, Integer schedule,Integer currentPage) {
+    public boolean updateSchedule(String code, Integer schedule,Integer currentPage,Integer currentPageInIndex) {
         McIeTask ieTask = new McIeTask();
         ieTask.setSchedule(schedule);
         ieTask.setCurrentPage(currentPage);
+        ieTask.setCurrentPageInIndex(currentPageInIndex);
         int update = mcIeTaskMapper.update(ieTask, new LambdaUpdateWrapper<McIeTask>()
                 .eq(McIeTask::getCode, code));
         return update > 0;
@@ -268,8 +272,9 @@ public class IeTaskService implements IIeTaskService {
         McIeTask mcIeTask = mcIeTaskMapper.selectOne(new LambdaQueryWrapper<McIeTask>().eq(McIeTask::getCode, request.getTaskCode()));
         Assert.isFalse(mcIeTask ==null,()-> new ServiceException("任务编码不存在！"));
 
-        Assert.isFalse(!ObjectUtil.isEmpty(mcIeTask.getExecutionTime()),()->new ServiceException("任务已启动！"));
-        mcIeTask.setExecutionTime(new Date());
+        Assert.isFalse(!ObjectUtil.isNull(mcIeTask.getExecutionTime()),()->new ServiceException("任务已启动！"));
+        TaskTemplate iExportTemplate = exportTemplateMap.get(mcIeTask.getTemplateCode());
+        mcIeTask.setExecutionTime(iExportTemplate.executionTime(false));
         mcIeTaskMapper.updateById(mcIeTask);
         asyncTaskService.execute(mcIeTask);
     }
@@ -304,6 +309,20 @@ public class IeTaskService implements IIeTaskService {
     public void updateTempFileSaveIp(String code, String ip) {
         McIeTask ieTask = new McIeTask();
         ieTask.setTempFileSaveIp(ip);
+        mcIeTaskMapper.update(ieTask, new LambdaUpdateWrapper<McIeTask>()
+                .eq(McIeTask::getCode, code));
+    }
+
+    /**
+     * 任务挂起
+     * @param code
+     * @param nextExecutionTime
+     */
+    @Override
+    public void hangUpTask(String code, Date nextExecutionTime) {
+        McIeTask ieTask = new McIeTask();
+        ieTask.setState(IeTaskState.STOP);
+        ieTask.setExecutionTime(nextExecutionTime);
         mcIeTaskMapper.update(ieTask, new LambdaUpdateWrapper<McIeTask>()
                 .eq(McIeTask::getCode, code));
     }

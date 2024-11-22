@@ -18,7 +18,8 @@ public enum IeTaskState implements IEnum<Integer> {
     EXECUTING(1, "执行中"),
     FILE_UPLOADING(2, "文件待上传"),
     FAIL(3, "失败"),
-    SUCCESS(4, "成功");
+    SUCCESS(4, "成功"),
+    STOP(5,"暂停");
     @EnumValue
     private Integer value;
 

@@ -120,4 +120,8 @@ public class McIeTask implements Serializable {
      * 临时文件保存服务器ip
      */
     private String tempFileSaveIp;
+    /**
+     * 当前分页内下标
+     */
+    private Integer currentPageInIndex;
 }

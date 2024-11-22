@@ -9,8 +9,6 @@ import java.util.List;
 
 /**
  * Excel增强器
- *
- * @author svnee
  **/
 public interface ExcelIntensifierExecutor {
 

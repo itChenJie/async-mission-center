@@ -32,7 +32,7 @@ public class IeTaskJob {
     @XxlJob("mission-center-export-task")
     public ReturnT<String> exportTask(){
         List<McIeTask> mcIeTasks = mcIeTaskMapper.selectList(new LambdaQueryWrapper<McIeTask>().in(McIeTask::getState
-                , IeTaskState.WAIT_START.getValue(), IeTaskState.FILE_UPLOADING.getValue())
+                        , IeTaskState.WAIT_START.getValue(), IeTaskState.FILE_UPLOADING.getValue(),IeTaskState.STOP.getValue())
                 .le(McIeTask::getExecutionTime,new Date()));
         if (CollUtil.isEmpty(mcIeTasks))
             return ReturnT.SUCCESS;

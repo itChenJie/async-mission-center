@@ -3,7 +3,6 @@ package com.mission.center.core.bean;
 import com.mission.center.constant.IeTaskState;
 import com.mission.center.core.task.IIeTaskService;
 import lombok.Data;
-
 import java.io.OutputStream;
 
 
@@ -40,4 +39,8 @@ public class TaskRequestContext {
      * 当前执行分页数
      */
     private Integer currentPage;
+    /**
+     * 当前执行分页数内数据下标
+     */
+    private Integer currentPageInIndex;
 }

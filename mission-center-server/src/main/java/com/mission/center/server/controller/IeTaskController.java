@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @Author: chenWenJie
+ */
+
 @RestController
 @RequestMapping("task")
 @RequiredArgsConstructor
@@ -39,6 +43,7 @@ public class IeTaskController {
     @ApiOperation("导出、导入生成任务")
     @PostMapping("add")
     public ResponseWrapper<IeTaskListBean> addTask(@RequestBody @Valid IeTaskAddRequest request) {
+        // TODO 改成AOP
         String requestId = IdempotencyHandlerUtil.generateRequestId(JSON.toJSONString(request));
         Assert.isFalse(redisTemplate.hasKey(RedisKey.TASK_REQUEST_ID + requestId),()->new ServiceException("操作过于频繁，请稍后！"));
         redisTemplate.opsForValue().set(RedisKey.TASK_REQUEST_ID + requestId,requestId,30, TimeUnit.SECONDS);

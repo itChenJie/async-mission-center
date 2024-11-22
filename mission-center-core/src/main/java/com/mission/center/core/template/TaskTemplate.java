@@ -6,9 +6,6 @@ import com.mission.center.core.bean.TaskRequestContext;
 
 import java.util.Date;
 
-/**
- * 任务模版基础接口
- */
 public interface TaskTemplate {
 
     /**
@@ -46,7 +43,7 @@ public interface TaskTemplate {
      * 获取可执行时间
      * @return 默认当前时间，自定义模版根据业务要求自定义
      */
-    default Date executionTime(){return  new Date();}
+    default Date executionTime(boolean isFirst){return new Date();}
 
     /**
      * 可执行区间 24小时制
@@ -62,3 +59,4 @@ public interface TaskTemplate {
      */
     default void processingFinish(String taskCode){return ;}
 }
+

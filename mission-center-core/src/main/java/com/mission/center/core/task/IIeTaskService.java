@@ -4,6 +4,8 @@ package com.mission.center.core.task;
 import com.mission.center.core.bean.UpdateNumberBean;
 import com.mission.center.core.bean.UpdateStateBean;
 
+import java.util.Date;
+
 public interface IIeTaskService {
     /**
      * 更新任务状态
@@ -17,10 +19,11 @@ public interface IIeTaskService {
      * 更新任务进度
      * @param code 任务编码
      * @param schedule 进度
-     * @param currentPage
+     * @param currentPage 当前分页
+     * @param currentPageTheIndex 当前分页内下标
      * @return
      */
-    public boolean updateSchedule(String code,Integer schedule,Integer currentPage);
+    public boolean updateSchedule(String code,Integer schedule,Integer currentPage,Integer currentPageTheIndex);
 
     /**
      * 更新任务文件远程地址
@@ -50,4 +53,11 @@ public interface IIeTaskService {
      * @param ip
      */
     void updateTempFileSaveIp(String taskCode, String ip);
+
+    /**
+     * 任务挂起
+     * @param taskCode
+     * @param nextExecutionTime
+     */
+    void hangUpTask(String taskCode, Date nextExecutionTime);
 }

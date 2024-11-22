@@ -1,6 +1,7 @@
 package com.mission.center.core.utils;
 
 import cn.hutool.core.lang.Assert;
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.mission.center.error.ServerCode;
 import com.mission.center.error.ServiceException;
 import com.mission.center.excel.annotations.McExcelProperty;
@@ -9,7 +10,6 @@ import com.mission.center.util.CommCollectionUtils;
 import com.mission.center.util.ReflectionUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-
 import javax.validation.groups.Default;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -46,11 +46,15 @@ public class ExcelBeanUtils {
      * @return excel 字段
      */
     public static <T> List<ExcelFiled> getExcelFileAnalyze(Class<T> sourceClazz, Class<?>... group) {
-        Assert.notNull(sourceClazz, ()-> new ServiceException(ServerCode.PARAM_ILLEGAL_ERROR));
+        Assert.notNull(sourceClazz, ()-> new ServiceException(ServerCode.PARAM_ERROR));
 
         LinkedHashSet<ExcelFiled> excelFiledList = loadCache(sourceClazz, sClazz -> {
             List<Field> fields = getClassFields(sClazz);
             return fields.stream().map(field -> {
+                        ExcelIgnore ignore = field.getDeclaredAnnotation(ExcelIgnore.class);
+                        if (!Objects.isNull(ignore))
+                            return null;
+
                         McExcelProperty excelProperty = getAnnotatedExcelProperty(field);
                         if (Objects.isNull(excelProperty)) {
                             return null;
@@ -124,7 +128,6 @@ public class ExcelBeanUtils {
         calculateColumnIndex(filedList);
         return filedList;
     }
-
     private static LinkedHashSet<ExcelFiled> loadCache(Class<?> sourceClazz, Function<Class<?>, LinkedHashSet<ExcelFiled>> cacheLoader) {
         LinkedHashSet<ExcelFiled> resultMap = GROUP_BY_FIELD_CACHE_MAP.get(sourceClazz);
         if (Objects.isNull(resultMap)) {

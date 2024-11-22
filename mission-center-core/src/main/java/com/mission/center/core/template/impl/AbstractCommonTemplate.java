@@ -11,6 +11,9 @@ import com.mission.center.core.task.IIeTaskService;
 import com.mission.center.entity.ResponseWrapper;
 import com.mission.center.error.ServerCode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Date;
 
 /**
  * @Description 模版抽象 公共类
@@ -35,10 +38,24 @@ public abstract class AbstractCommonTemplate {
      * @param totalPage
      * @param currentPage
      */
-    protected void updateProcess(String code,int currentPage,Integer totalPage){
+    protected void updateProcess(String code,Integer currentPage,Integer totalPage){
         double process = (currentPage + 1) / (totalPage * Constants.DOUBLE_ONE);
         int executeProcess = (int) (process * Constants.FULL_PROCESS);
-        iIeTaskService.updateSchedule(code, executeProcess,currentPage+1);
+        iIeTaskService.updateSchedule(code, executeProcess,currentPage+1,0);
+    }
+
+    /**
+     * 更新进度
+     * @param code
+     * @param currentPage
+     * @param totalPage
+     * @param currentPage
+     * @param currentPageInIndex
+     */
+    protected void updateProcess(String code,Integer currentPage,Integer currentPageInIndex,Integer totalPage){
+        double process = (currentPage + 1) / (totalPage * Constants.DOUBLE_ONE);
+        int executeProcess = (int) (process * Constants.FULL_PROCESS);
+        iIeTaskService.updateSchedule(code, executeProcess,currentPage+1,currentPageInIndex);
     }
 
     /**
@@ -63,11 +80,20 @@ public abstract class AbstractCommonTemplate {
 
     protected static void checkCountResponse(ResponseWrapper wrapper) {
         Assert.isFalse(!ServerCode.SUCCESS.getCode().equals(wrapper.getCode()), "查询总数失败："+ wrapper.getDesc());
-        Assert.isFalse(ObjectUtil.isNull(wrapper.getData()), "查询总数失败 数据为空！");
+        Assert.isFalse(ObjectUtil.isEmpty(wrapper.getData()), "查询总数失败 数据为空！");
     }
 
     protected static void checkPageResponse(ResponseWrapper wrapper) {
         Assert.isFalse(!ServerCode.SUCCESS.getCode().equals(wrapper.getCode()), "查询当前页数据失败："+wrapper.getDesc());
-        Assert.isFalse(ObjectUtil.isNull(wrapper.getData()), "查询当前页数据失败 数据为空！");
+        Assert.isFalse(ObjectUtil.isEmpty(wrapper.getData()), "查询当前页数据失败 数据为空！");
+    }
+
+    /**
+     * 任务挂起
+     * @param taskCode
+     * @param nextExecutionTime
+     */
+    protected void hangUpTask(String taskCode, Date nextExecutionTime) {
+        iIeTaskService.hangUpTask(taskCode,nextExecutionTime);
     }
 }

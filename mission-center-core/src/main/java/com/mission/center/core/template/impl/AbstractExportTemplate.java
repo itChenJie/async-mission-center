@@ -77,7 +77,7 @@ public abstract class AbstractExportTemplate<T> extends AbstractCommonTemplate i
             Long number = 0l;
             for (int i = 0; i < totalPage; i++) {
                 page.setPageNum(i + 1);
-                Pair<Long, List<T>> pair  = shardingData(context, page, cursorId);
+                Pair<Long, List<T>>  pair  = shardingData(context, page, cursorId);
                 if (Objects.nonNull(pair)) {
                     cursorId = pair.getKey();
                     switch (templateType) {

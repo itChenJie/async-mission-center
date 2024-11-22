@@ -16,6 +16,7 @@ import com.mission.center.server.entity.McIeTask;
 import com.mission.center.util.TaskUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -60,11 +61,12 @@ public class AsyncTaskService {
             return;
         }
 
-        if (!StrUtil.isBlank(ieTask.getExecutionSection())){
+        if (!StringUtils.isBlank(ieTask.getExecutionSection())){
             boolean execution = false;
             for (String section : ieTask.getExecutionSection().split(Constants.COMMA_SPLITTER)) {
                 String[] split = section.split(Constants.TRANSVERSE_LINE);
-                Assert.isFalse(split.length!=2,()->new ServiceException("任务 可执行区间设置不规范 无法执行！"+ieTask.getTemplateCode()));
+                Assert.isFalse(split.length!=2,()->new ServiceException("任务 可执行区间设置不规范 无法执行！"+
+                        ieTask.getTemplateCode()));
 
                 boolean timeSection = TaskUtils.chackTimeSection(split[0], split[1]);
                 execution = timeSection?timeSection:execution;
@@ -75,7 +77,7 @@ public class AsyncTaskService {
                 return;
             }
         }
-        
+
         log.info("计划开始执行任务：{}",ieTask.getCode());
         TaskRequestContext context = new TaskRequestContext();
         context.setIIeTaskService(iIeTaskService);
@@ -86,6 +88,7 @@ public class AsyncTaskService {
         context.setState(ieTask.getState());
         context.setFileName(ieTask.getFileName());
         context.setCurrentPage(ieTask.getCurrentPage());
+        context.setCurrentPageInIndex(ieTask.getCurrentPageInIndex());
         switch (ieTask.getType()){
             case IMPORT:
                 threadPoolExecutor.execute(new ImportExecutor(context));

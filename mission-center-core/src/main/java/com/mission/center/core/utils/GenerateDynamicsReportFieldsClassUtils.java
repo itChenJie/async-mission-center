@@ -1,8 +1,6 @@
 package com.mission.center.core.utils;
 
-import com.mission.center.excel.annotations.McExcelProperty;
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 
@@ -17,9 +15,12 @@ public class GenerateDynamicsReportFieldsClassUtils {
     public static Class generateClass(List<Object> titles){
         DynamicType.Builder<?> builder = new ByteBuddy()
                 .subclass(Object.class)
-                .name("com.mission.center.core.GenerateDynamicsReportFieldsClass");
-//        for (int i = 0; i < titles.size(); i++) {
-//            DynamicsReportFields title = (DynamicsReportFields)titles.get(i);
+                .name("com.ssdl.handle.core.GenerateDynamicsReportFieldsClass");
+        for (int i = 0; i < titles.size(); i++) {
+//            DynamicsReportQueryField title = (DynamicsReportQueryField)titles.get(i);
+//            if (title.getFieldName() == null || title.getFieldCode() == null) {
+//                throw new IllegalArgumentException("Dynamics Report Query Field fieldName fieldCode is null");
+//            }
 //            AnnotationDescription exampleAnnotation = AnnotationDescription.Builder
 //                    .ofType(McExcelProperty.class)
 //                    .define("value", title.getFieldName())
@@ -28,7 +29,7 @@ public class GenerateDynamicsReportFieldsClassUtils {
 //            builder = builder
 //                    .defineField(title.getFieldCode(), String.class)
 //                    .annotateField(exampleAnnotation);
-//        }
+        }
 
         Class<?> dynamicType = builder
                 .make()

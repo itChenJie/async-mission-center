@@ -84,14 +84,4 @@ public class DemoCleanseTemplate extends AbstractCleanseTemplate {
     public void processingFinish(String taskCode) {
 
     }
-
-    /**
-     * 获取可执行时间
-     *
-     * @return 默认当前时间，自定义模版根据业务要求自定义
-     */
-    @Override
-    public Date executionTime() {
-        return null;
-    }
 }

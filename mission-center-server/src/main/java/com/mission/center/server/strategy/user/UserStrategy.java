@@ -8,6 +8,10 @@ import com.mission.center.server.vo.IeTaskUserListBean;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 用户策略累
+ * @Author: chenWenJie
+ */
 public interface UserStrategy {
     /**
      * 查询用户

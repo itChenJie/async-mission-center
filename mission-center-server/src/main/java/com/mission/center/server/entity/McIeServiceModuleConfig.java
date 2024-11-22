@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  * 任务中心导出业务模块配置
  */
 @Data
-@TableName("mc_ie_service_module_config")
+//@TableName("mc_ie_service_module_config")
 public class McIeServiceModuleConfig implements Serializable {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)

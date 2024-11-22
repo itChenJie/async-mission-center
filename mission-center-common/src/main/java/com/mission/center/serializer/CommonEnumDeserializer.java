@@ -1,6 +1,7 @@
 package com.mission.center.serializer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
@@ -23,7 +24,7 @@ public class CommonEnumDeserializer implements ObjectDeserializer {
                 Class<?> clazz = (Class<?>) type;
                 if (clazz.isEnum()) {
                     String value = parser.parseObject(String.class);
-                    if (StrUtil.isBlank(value))
+                    if (StringUtils.isBlank(value))
                         return null;
 
                     return (T) Enum.valueOf((Class<Enum>) clazz, value);
@@ -35,7 +36,7 @@ public class CommonEnumDeserializer implements ObjectDeserializer {
                 if (List.class.isAssignableFrom((Class<?>) rawType)){
                     List<Enum<?>> list = new ArrayList<>();
                     List<String> values = parser.parseObject(List.class);
-                    if (CollUtil.isEmpty(values))
+                    if (ObjectUtil.isNull(values))
                         return null;
 
                     for (String value : values) {
