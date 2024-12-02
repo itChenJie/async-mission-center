@@ -9,7 +9,7 @@ CREATE TABLE `mc_ie_task` (
   `template_name` varchar(150) NOT NULL COMMENT '模版名称',
   `service_model_user_id` varchar(100) NOT NULL COMMENT '业务模块导出用户唯一标识',
   `type` int(11) NOT NULL COMMENT '任务类型0导出 1导入 3数据处理',
-  `state` int(11) NOT NULL DEFAULT '0' COMMENT '状态 0待启动 1执行中 2文件待上传 3失败 4成功',
+  `state` int(11) NOT NULL DEFAULT '0' COMMENT '状态 0待启动 1执行中 2文件待上传 3失败 4成功 5暂停',
   `total_number` int(11) DEFAULT NULL COMMENT '总条数',
   `description` text COMMENT '备注',
   `query_condition_json` varchar(500) DEFAULT NULL COMMENT '查询条件json',
