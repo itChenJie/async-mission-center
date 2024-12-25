@@ -21,6 +21,7 @@ import com.mission.center.server.convert.McIeTaskConvert;
 import com.mission.center.server.entity.McIeTask;
 import com.mission.center.server.executor.AsyncTaskService;
 import com.mission.center.server.mapper.McIeTaskMapper;
+import com.mission.center.server.sse.SseServer;
 import com.mission.center.server.strategy.user.UserStrategy;
 import com.mission.center.server.util.CodeUtilBean;
 import com.mission.center.server.vo.*;
@@ -192,6 +193,9 @@ public class IeTaskService implements IIeTaskService {
         int update = mcIeTaskMapper.update(ieTask, new LambdaUpdateWrapper<McIeTask>()
                 .eq(McIeTask::getCode, code)
                 .eq(stateBean.getOldState() != null, McIeTask::getState, stateBean.getOldState()));
+        if (stateBean.getNewState()==IeTaskState.SUCCESS){
+            SseServer.sendMessage(SseServer.userKey(ieTask.getServiceModelUserId(),ieTask.getModuleCode().getValue()), "任务执行完成！");
+        }
         return update > 0;
     }
 
