@@ -2,23 +2,27 @@ package com.mission.center.core.utils;
 
 import cn.hutool.core.lang.Assert;
 import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
+import com.alibaba.excel.converters.AutoConverter;
+import com.alibaba.excel.converters.Converter;
 import com.mission.center.error.ServerCode;
 import com.mission.center.error.ServiceException;
-import com.mission.center.excel.annotations.McExcelProperty;
+import com.mission.center.excel.annotations.McColumnWidth;
 import com.mission.center.excel.bean.ExcelFiled;
-import com.mission.center.util.CommCollectionUtils;
 import com.mission.center.util.ReflectionUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import javax.validation.groups.Default;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ExcelBeanUtils {
     /**
      * 导出实体，字段属性缓存
@@ -52,14 +56,15 @@ public class ExcelBeanUtils {
             List<Field> fields = getClassFields(sClazz);
             return fields.stream().map(field -> {
                         ExcelIgnore ignore = field.getDeclaredAnnotation(ExcelIgnore.class);
-                        if (!Objects.isNull(ignore))
-                            return null;
-
-                        McExcelProperty excelProperty = getAnnotatedExcelProperty(field);
-                        if (Objects.isNull(excelProperty)) {
+                        if (!Objects.isNull(ignore)) {
                             return null;
                         }
-                        ExcelFiled excelFiled = new ExcelFiled(field, excelProperty);
+
+                        ExcelFiled excelFiled = createExcelFiled(field);
+                        if (excelFiled == null) {
+                            return null;
+                        }
+
                         Class<?> subClass = null;
                         boolean existedSub = false;
                         if (ReflectionUtils.isCollection(field.getType())) {
@@ -79,14 +84,9 @@ public class ExcelBeanUtils {
                         // 如果存在子字段，则获取子字段
                         if (existedSub && Objects.nonNull(subClass)) {
                             List<ExcelFiled> subFieldList = getClassFields(subClass).stream()
-                                    .map(e -> {
-                                        McExcelProperty subProperty = getAnnotatedExcelProperty(e);
-                                        if (Objects.nonNull(subProperty)) {
-                                            return new ExcelFiled(e, subProperty);
-                                        }
-                                        return null;
-                                    }).filter(Objects::nonNull)
-                                    .sorted((Comparator.comparingInt(o -> o.getExcelProperty().order())))
+                                    .map(e -> createExcelFiled(e))
+                                    .filter(Objects::nonNull)
+                                    .sorted((Comparator.comparingInt(ExcelFiled::getOrder)))
                                     .collect(Collectors.toList());
                             excelFiled.setSubFiledList(subFieldList);
                             if (CollectionUtils.isEmpty(subFieldList)) {
@@ -95,40 +95,74 @@ public class ExcelBeanUtils {
                         }
                         return excelFiled;
                     }).filter(Objects::nonNull)
-                    .sorted((Comparator.comparingInt(o -> o.getExcelProperty().order())))
+                    .sorted((Comparator.comparingInt(ExcelFiled::getOrder)))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         });
 
-        // 分组
-        Set<Class<?>> groupSet;
-        if (group == null || group.length == 0) {
-            groupSet = new HashSet<>();
-            groupSet.add(Default.class);
-        } else {
-            groupSet = new HashSet<>(CommCollectionUtils.newArrayList(group));
-        }
+//        // 分组
+//        Set<Class<?>> groupSet;
+//        if (group == null || group.length == 0) {
+//            groupSet = new HashSet<>();
+//            groupSet.add(Default.class);
+//        } else {
+//            groupSet = new HashSet<>(CommCollectionUtils.newArrayList(group));
+//        }
+//
+//        //获取所有的包含分组的字段
+//        List<ExcelFiled> filedList = excelFiledList.stream().filter(e -> {
+//                    // 如果当前符合条件了直接进行判断子字段是否符合
+//                    boolean groupField = isBelongGroup(e, groupSet);
+//                    if (groupField) {
+//                        List<ExcelFiled> subFieldList = Optional.ofNullable(e.getSubFiledList())
+//                                .orElse(Collections.emptyList())
+//                                .stream()
+//                                .filter(subFiled -> isBelongGroup(subFiled, groupSet))
+//                                .collect(Collectors.toList());
+//                        e.setSubFiledList(subFieldList);
+//                    }
+//                    return groupField;
+//                }).sorted(Comparator.comparingInt(o -> o.getExcelProperty().order()))
+//                .collect(Collectors.toList());
 
-        //获取所有的包含分组的字段
-        List<ExcelFiled> filedList = excelFiledList.stream().filter(e -> {
-                    // 如果当前符合条件了直接进行判断子字段是否符合
-                    boolean groupField = isBelongGroup(e, groupSet);
-                    if (groupField) {
-                        List<ExcelFiled> subFieldList = Optional.ofNullable(e.getSubFiledList())
-                                .orElse(Collections.emptyList())
-                                .stream()
-                                .filter(subFiled -> isBelongGroup(subFiled, groupSet))
-                                .collect(Collectors.toList());
-                        e.setSubFiledList(subFieldList);
-                    }
-                    return groupField;
-                }).sorted(Comparator.comparingInt(o -> o.getExcelProperty().order()))
-                .collect(Collectors.toList());
+        // 分组暂不处理，直接返回所有字段
+        List<ExcelFiled> filedList = new ArrayList<>(excelFiledList);
 
         // 计算下标
         calculateColumnIndex(filedList);
         return filedList;
     }
-    private static LinkedHashSet<ExcelFiled> loadCache(Class<?> sourceClazz, Function<Class<?>, LinkedHashSet<ExcelFiled>> cacheLoader) {
+
+    /**
+     * 创建 ExcelFiled 对象
+     * @param field 字段
+     * @return ExcelFiled 或 null（如果字段没有 @ExcelProperty 注解）
+     */
+    private static ExcelFiled createExcelFiled(Field field) {
+        ExcelProperty excelProperty = getAnnotatedExcelProperty(field);
+        if (excelProperty == null) {
+            return null;
+        }
+
+        McColumnWidth columnWidth = field.getDeclaredAnnotation(McColumnWidth.class);
+        DateTimeFormat dateTimeFormat = field.getDeclaredAnnotation(DateTimeFormat.class);
+
+        ExcelFiled excelFiled = new ExcelFiled(field, excelProperty, columnWidth, dateTimeFormat);
+
+        // 初始化 converter
+        Class<? extends Converter> converterClass = excelProperty.converter();
+        if (converterClass != null && converterClass != AutoConverter.class) {
+            try {
+                Converter<Object> converter = (Converter<Object>) converterClass.newInstance();
+                excelFiled.setConverterInstance(converter);
+            } catch (Exception e) {
+                log.warn("converter instance create failed for field: {}", field.getName(), e);
+            }
+        }
+
+        return excelFiled;
+    }
+
+    private static LinkedHashSet<ExcelFiled> loadCache(Class<?> sourceClazz, java.util.function.Function<Class<?>, LinkedHashSet<ExcelFiled>> cacheLoader) {
         LinkedHashSet<ExcelFiled> resultMap = GROUP_BY_FIELD_CACHE_MAP.get(sourceClazz);
         if (Objects.isNull(resultMap)) {
             LinkedHashSet<ExcelFiled> cacheSet = cacheLoader.apply(sourceClazz);
@@ -160,22 +194,17 @@ public class ExcelBeanUtils {
     }
 
     /**
-     * 获取被ExcelProperty注解标注的注解
+     * 获取被 ExcelProperty 注解标注的注解
      *
      * @param field 属性字段
-     * @return McExcelProperty
+     * @return ExcelProperty
      */
-    private static McExcelProperty getAnnotatedExcelProperty(Field field) {
-        McExcelProperty property = field.getDeclaredAnnotation(McExcelProperty.class);
+    private static ExcelProperty getAnnotatedExcelProperty(Field field) {
+        ExcelProperty property = field.getDeclaredAnnotation(ExcelProperty.class);
         if (Objects.nonNull(property)) {
             return property;
         }
-        return AnnotatedElementUtils.findMergedAnnotation(field, McExcelProperty.class);
-    }
-
-    private static boolean isBelongGroup(ExcelFiled filed, Set<?> groupSet) {
-        return CollectionUtils.isNotEmpty(CollectionUtils.intersection(groupSet,
-                CommCollectionUtils.newArrayList(filed.getExcelProperty().group())));
+        return AnnotatedElementUtils.findMergedAnnotation(field, ExcelProperty.class);
     }
 
     /**

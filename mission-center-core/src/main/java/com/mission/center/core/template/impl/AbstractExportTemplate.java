@@ -11,7 +11,6 @@ import com.mission.center.core.utils.ExcelBeanUtils;
 import com.mission.center.error.ServiceException;
 import com.mission.center.excel.ExcelBean;
 import com.mission.center.excel.ExcelExports;
-import com.mission.center.excel.annotations.McExcelProperty;
 import com.mission.center.excel.bean.ExcelFiled;
 import com.mission.center.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,7 @@ public abstract class AbstractExportTemplate<T> extends AbstractCommonTemplate i
     }
 
     /**
-     * 导出模板类分组 {@link McExcelProperty#group()}
+     * 导出模板类分组
      *
      * @param context context
      * @return export class group
@@ -74,7 +73,7 @@ public abstract class AbstractExportTemplate<T> extends AbstractCommonTemplate i
             int totalPage = PageUtil.totalPage(pageTotal.getTotal(), pageTotal.getPageSize());
             Page page = new Page(1, pageTotal.getPageSize(), pageTotal.getTotal());
             Long cursorId = 0L;
-            Long number = 0l;
+            Long number = 0L;
             for (int i = 0; i < totalPage; i++) {
                 page.setPageNum(i + 1);
                 Pair<Long, List<T>>  pair  = shardingData(context, page, cursorId);

@@ -1,16 +1,17 @@
 package com.mission.center.excel;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.util.StrUtil;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.converters.Converter;
+import com.alibaba.excel.metadata.data.WriteCellData;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.mission.center.constants.Constants;
-import com.mission.center.excel.annotations.McExcelProperty;
 import com.mission.center.excel.bean.ExcelFiled;
 import com.mission.center.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
@@ -104,7 +105,7 @@ public class ExcelExports {
 
         boolean needSubTitle = exportFields.stream()
                 .anyMatch(e -> CollectionUtils.isNotEmpty(e.getSubFiledList())
-                        && StringUtils.isNotBlank(e.getExcelProperty().value()));
+                        && StringUtils.isNotBlank(e.getHeaderName()));
         Row subHeaderRow = needSubTitle ? sheet.createRow(1) : headerRow;
         titleRow = needSubTitle ? titleRow + 1 : titleRow;
         excelBean.writeRow(titleRow, sheetGroup);
@@ -112,15 +113,17 @@ public class ExcelExports {
         // 装饰表头标题格式
         CellStyle cellStyle = excelBean.decorateHeader();
         for (ExcelFiled field : exportFields) {
-            McExcelProperty excelProperty = field.getExcelProperty();
-            if (excelProperty!=null){
-                sheet.setColumnWidth(field.getFrmColumnIndex(), excelProperty.width());
+
+            ExcelProperty excelProperty = field.getExcelProperty();
+            if (excelProperty != null) {
+                sheet.setColumnWidth(field.getFrmColumnIndex(), field.getWidth());
             }
             if (!field.isCollection() && CollectionUtils.isEmpty(field.getSubFiledList())) {
                 Cell cell = headerRow.createCell(field.getFrmColumnIndex());
                 cell.setCellStyle(cellStyle);
-                if (StringUtils.isNotBlank(excelProperty.value())) {
-                    setCellValue(cell, excelProperty.value(), field);
+                String headerName = field.getHeaderName();
+                if (StringUtils.isNotBlank(headerName)) {
+                    setCellValue(cell, headerName, field);
                 } else {
                     setCellValue(cell, field.getField().getName(), field);
                 }
@@ -134,25 +137,27 @@ public class ExcelExports {
                 }
             } else {
                 // 如果设置的单元格属性的为空则不设置子表头
-                if (field.getExcelProperty()!=null&&StringUtils.isNotBlank(field.getExcelProperty().value())) {
+                String headerName = field.getHeaderName();
+                if (excelProperty != null && StringUtils.isNotBlank(headerName)) {
                     Cell cell = headerRow.createCell(field.getFrmColumnIndex());
                     cell.setCellStyle(cellStyle);
-                    setCellValue(cell, field.getExcelProperty().value(), field);
+                    setCellValue(cell, headerName, field);
                     // 设置单元格并做合并 (index-->index+subIndex)
                     PoiMergeCellUtil.addMergedRegion(sheet, 0, 0, field.getFrmColumnIndex(), field.getToColumnIndex());
                 }
                 for (ExcelFiled subField : field.getSubFiledList()) {
                     Row customTitleRow =
-                            StringUtils.isBlank(field.getExcelProperty().value()) ? headerRow : subHeaderRow;
-                    sheet.setColumnWidth(subField.getFrmColumnIndex(), subField.getExcelProperty().width());
+                            StringUtils.isBlank(headerName) ? headerRow : subHeaderRow;
+                    sheet.setColumnWidth(subField.getFrmColumnIndex(), subField.getWidth());
                     Cell cell = customTitleRow.createCell(subField.getFrmColumnIndex());
                     cell.setCellStyle(cellStyle);
-                    if (StringUtils.isNotBlank(subField.getExcelProperty().value())) {
-                        setCellValue(cell, subField.getExcelProperty().value(), subField);
+                    String subHeaderName = subField.getHeaderName();
+                    if (StringUtils.isNotBlank(subHeaderName)) {
+                        setCellValue(cell, subHeaderName, subField);
                     } else {
                         setCellValue(cell, subField.getField().getName(), subField);
                     }
-                    if (StringUtils.isBlank(field.getExcelProperty().value()) && needSubTitle) {
+                    if (StringUtils.isBlank(headerName) && needSubTitle) {
                         // 设置单元格并做合并 (0,index-->1,index)
                         PoiMergeCellUtil
                                 .addMergedRegion(sheet, 0, 1, subField.getFrmColumnIndex(), subField.getToColumnIndex());
@@ -312,6 +317,20 @@ public class ExcelExports {
         if (Objects.isNull(obj)) {
             return Constants.EMPTY_STRING;
         }
+
+        // 优先使用 converter
+        Converter<Object> converter = filed.getConverterInstance();
+        if (converter != null) {
+            try {
+                WriteCellData<?> cellData = converter.convertToExcelData(obj, null, null);
+                if (cellData != null && cellData.getStringValue() != null) {
+                    return cellData.getStringValue();
+                }
+            } catch (Exception e) {
+                log.warn("converter convert failed, use default value", e);
+            }
+        }
+
         if (obj instanceof String) {
             return (String) obj;
         } else if (obj instanceof Date) {
@@ -328,9 +347,7 @@ public class ExcelExports {
      * @return
      */
     private static String formatDate(Date date, ExcelFiled field) {
-        McExcelProperty excelProperty = field.getExcelProperty();
-        String dateFormatter = (excelProperty==null||StrUtil.isBlank(excelProperty.dateFormatter()))
-                ? DatePattern.NORM_DATE_PATTERN:excelProperty.dateFormatter();
+        String dateFormatter = field.getDateFormatter();
         return new SimpleDateFormat(dateFormatter).format(date);
     }
 }

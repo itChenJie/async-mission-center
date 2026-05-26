@@ -3,6 +3,11 @@ package com.mission.center.excel.annotations;
 import javax.validation.groups.Default;
 import java.lang.annotation.*;
 
+/**
+ * 已废弃，请使用 Alibaba @ExcelProperty + @McColumnWidth + @DateTimeFormat
+ * @deprecated 使用 {@link com.alibaba.excel.annotation.ExcelProperty} 替代
+ */
+@Deprecated
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
