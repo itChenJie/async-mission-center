@@ -13,11 +13,11 @@ public class DataHandleBean {
     /**
      * 成功数
      */
-    private Long successNumber = 0l;
+    private Long successNumber = 0L;
     /**
      * 失败数
      */
-    private Long failNumber= 0l;
+    private Long failNumber= 0L;
     /**
      * 当前执行分页数据下标
      */
