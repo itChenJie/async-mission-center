@@ -72,4 +72,13 @@ public class FileService {
             throw new ServiceException("文件创建失败！" + filePath);
         }
     }
+
+    /**
+     * 从 OSS 下载文件到本地
+     * @param ossKey OSS 文件 key
+     * @param localFilePath 本地文件路径
+     */
+    public void downloadFromOss(String ossKey, String localFilePath) {
+        ossClientUtil.downloadToLocal(ossKey, localFilePath);
+    }
 }

@@ -36,6 +36,10 @@ public class TaskRequestContext {
      */
     private String fileName;
     /**
+     * 导入文件OSS key
+     */
+    private String importFileKey;
+    /**
      * 当前执行分页数
      */
     private Integer currentPage;

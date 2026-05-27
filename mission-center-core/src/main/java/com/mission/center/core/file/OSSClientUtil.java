@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
@@ -163,6 +164,21 @@ public class OSSClientUtil {
         VoidResult result = ossClient.deleteObject(bucketName, key);
         Assert.isFalse(result.getResponse()==null||!result.getResponse().isSuccessful()
                 ,()->new ServiceException("oss 文件删除失败！"));
+    }
+
+    /**
+     * 下载 OSS 文件到本地
+     * @param key OSS 文件 key
+     * @param localFilePath 本地文件路径
+     */
+    public void downloadToLocal(String key, String localFilePath) {
+        try {
+            File localFile = new File(localFilePath);
+            ossClient.getObject(new GetObjectRequest(bucketName, key), localFile);
+        } catch (OSSException oe) {
+            log.error("oss 文件下载失败！", oe);
+            throw new ServiceException("oss 文件下载失败！");
+        }
     }
 
 }

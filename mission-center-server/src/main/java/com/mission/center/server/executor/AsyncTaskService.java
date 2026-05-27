@@ -11,6 +11,7 @@ import com.mission.center.core.file.FileService;
 import com.mission.center.core.task.IIeTaskService;
 import com.mission.center.core.template.impl.AbstractCleanseTemplate;
 import com.mission.center.core.template.impl.AbstractExportTemplate;
+import com.mission.center.core.template.impl.AbstractImportTemplate;
 import com.mission.center.error.ServiceException;
 import com.mission.center.server.entity.McIeTask;
 import com.mission.center.util.TaskUtils;
@@ -37,6 +38,8 @@ public class AsyncTaskService {
 
     private final Map<String, AbstractExportTemplate> exportTemplateMap;
 
+    private final Map<String, AbstractImportTemplate> importTemplateMap;
+
     private final Map<String, AbstractCleanseTemplate> cleanseTemplateMap;
 
     private final FileService fileService;
@@ -50,6 +53,8 @@ public class AsyncTaskService {
     @Value("${task.cleanse.shardingSize}")
     private Integer cleanseShardingSize;
 
+    @Value("${task.import.shardingSize}")
+    private Integer importShardingSize;
     /**
      * 任务执行
      * @param ieTask
@@ -91,7 +96,9 @@ public class AsyncTaskService {
         context.setCurrentPageInIndex(ieTask.getCurrentPageInIndex());
         switch (ieTask.getType()){
             case IMPORT:
-                threadPoolExecutor.execute(new ImportExecutor(context));
+                context.setImportFileKey(ieTask.getImportFileKey());
+                context.setShardingSize(importShardingSize);
+                threadPoolExecutor.execute(new ImportExecutor(importTemplateMap, fileService, context));
                 break;
             case EXPORT:
                 context.setShardingSize(ieShardingSize);

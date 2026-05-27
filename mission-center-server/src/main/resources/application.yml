@@ -25,6 +25,8 @@ task:
     shardingSize: 1000
   cleanse:
     shardingSize: 50
+  import:
+    shardingSize: 1000
 file:
   root-path: temp
 
