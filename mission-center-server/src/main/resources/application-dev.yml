@@ -10,8 +10,8 @@ spring:
   datasource:
     druid:
       url:
-      username: ssdl
-      password: ssdl@0518
+      username:
+      password:
       initial-size: 1
       max-active: 50
       min-idle: 1
@@ -27,6 +27,19 @@ spring:
         login-password: admin&zaq9
         allow: false
     driver: com.mysql.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    password: bati
+    port: 6379
+    database: 0
+    timeout: 60000
+    lettuce:
+      pool:
+        max-idle: 30
+        min-idle: 10
+        max-active: 16
+        max-wait: 10000
+
 
 oss:
   endpoint:

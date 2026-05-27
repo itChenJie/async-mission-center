@@ -1,6 +1,6 @@
 CREATE TABLE `mc_ie_task` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `code` varchar(50) NOT NULL COMMENT '任务编号(数据处理、导入批次号)',
   `module_code` varchar(50) NOT NULL COMMENT '业务模块编码',
@@ -12,7 +12,7 @@ CREATE TABLE `mc_ie_task` (
   `state` int(11) NOT NULL DEFAULT '0' COMMENT '状态 0待启动 1执行中 2文件待上传 3失败 4成功 5暂停',
   `total_number` int(11) DEFAULT NULL COMMENT '总条数',
   `description` text COMMENT '备注',
-  `query_condition_json` varchar(500) DEFAULT NULL COMMENT '查询条件json',
+  `query_condition_json` varchar(1500) DEFAULT NULL COMMENT '查询条件json',
   `file_name` varchar(150) DEFAULT NULL COMMENT '文件名',
   `file_key` varchar(255) DEFAULT NULL COMMENT '文件服务器key',
   `schedule` int(4) NOT NULL DEFAULT '0' COMMENT '进度',
@@ -27,9 +27,24 @@ CREATE TABLE `mc_ie_task` (
   `current_page` int(9) NOT NULL DEFAULT '0' COMMENT '当前执行分页数',
   `temp_file_save_ip` varchar(50) DEFAULT NULL COMMENT '临时文件保存服务器ip',
   `current_page_in_index` int(10) DEFAULT '0' COMMENT '当前分页内下标',
+  `is_show` int(1) NOT NULL DEFAULT '1' COMMENT '是否展示',
   PRIMARY KEY (`id`),
   UNIQUE KEY `undx_code` (`code`) USING BTREE,
   KEY `idx_ created_at` (`create_time`) USING BTREE,
   KEY `idx_ state` (`state`) USING BTREE,
   KEY `idx_service_module_code_user` (`module_code`,`service_model_user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='任务管理';
+
+-- 导出测试表结构
+CREATE TABLE `mc_export_test` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_name` varchar(50) DEFAULT NULL COMMENT '用户名',
+  `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
+  `phone` varchar(20) DEFAULT NULL COMMENT '手机号',
+  `status` int DEFAULT 0 COMMENT '状态(0-待处理,1-处理中,2-已完成)',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `amount` decimal(10,2) DEFAULT 0.00 COMMENT '金额',
+  `description` varchar(200) DEFAULT NULL COMMENT '描述',
+  PRIMARY KEY (`id`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='导出测试表';
