@@ -2,6 +2,7 @@ package com.mission.center.server.service;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -17,6 +18,7 @@ import com.mission.center.core.task.IIeTaskService;
 import com.mission.center.core.template.TaskTemplate;
 import com.mission.center.entity.ResponseWrapper;
 import com.mission.center.error.ServiceException;
+import com.mission.center.server.config.RedisPubSubConfig;
 import com.mission.center.server.convert.McIeTaskConvert;
 import com.mission.center.server.entity.McIeTask;
 import com.mission.center.server.executor.AsyncTaskService;
@@ -193,8 +195,21 @@ public class IeTaskService implements IIeTaskService {
         int update = mcIeTaskMapper.update(ieTask, new LambdaUpdateWrapper<McIeTask>()
                 .eq(McIeTask::getCode, code)
                 .eq(stateBean.getOldState() != null, McIeTask::getState, stateBean.getOldState()));
-        if (stateBean.getNewState()==IeTaskState.SUCCESS){
-            // TODO 站内消息待完善
+
+        // 任务成功或失败时，发送站内信通知
+        if (update > 0 && (stateBean.getNewState() == IeTaskState.SUCCESS || stateBean.getNewState() == IeTaskState.FAIL)) {
+            McIeTask task = mcIeTaskMapper.selectOne(new LambdaQueryWrapper<McIeTask>().eq(McIeTask::getCode, code));
+            if (task != null && !StringUtils.isBlank(task.getServiceModelUserId()) && task.getModuleCode() != null) {
+                String statusStr = stateBean.getNewState() == IeTaskState.SUCCESS ? "成功" : "失败";
+                String msgContent = String.format("您的任务【%s】执行%s", task.getTemplateName(), statusStr);
+
+                JSONObject payload = new JSONObject();
+                payload.put("moduleCode", task.getModuleCode().getValue());
+                payload.put("userId", task.getServiceModelUserId());
+                payload.put("msg", msgContent);
+
+                redisTemplate.convertAndSend(RedisPubSubConfig.SSE_TASK_CHANNEL, payload.toJSONString());
+            }
         }
         return update > 0;
     }

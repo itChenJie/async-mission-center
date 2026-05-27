@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("template")
 @RequiredArgsConstructor
-@Api(description = "导入导出任务中心模版管理")
+@Api(tags = "导入导出任务中心模版管理")
 public class IeTemplateController {
     private final IeTemplateService ieTemplateService;
 

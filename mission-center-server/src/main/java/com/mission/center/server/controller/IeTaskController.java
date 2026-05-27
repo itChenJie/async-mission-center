@@ -18,7 +18,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("task")
 @RequiredArgsConstructor
-@Api(description = "导入导出任务中心")
+@Api(tags = "导入导出任务中心")
 public class IeTaskController {
     private final IeTaskService taskService;
 
