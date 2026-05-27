@@ -1,14 +1,11 @@
 package com.mission.center.server.controller;
 
-import cn.hutool.core.lang.Assert;
-import com.alibaba.fastjson.JSON;
+import com.mission.center.annotation.Idempotent;
 import com.mission.center.constants.RedisKey;
 import com.mission.center.entity.ResponseWrapper;
-import com.mission.center.error.ServiceException;
 import com.mission.center.server.service.IeTaskService;
 import com.mission.center.server.service.UserService;
 import com.mission.center.server.vo.*;
-import com.mission.center.util.IdempotencyHandlerUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.concurrent.TimeUnit;
 
-/**
- * @Author: chenWenJie
- */
 
 @RestController
 @RequestMapping("task")
@@ -31,8 +24,6 @@ public class IeTaskController {
 
     private final UserService userService;
 
-    private final StringRedisTemplate redisTemplate;
-
     @ApiOperation("导出导入任务查询")
     @PostMapping("list")
     public ResponseWrapper<IeTaskListResponse> companyCityList(@RequestBody @Valid IeTaskListRequest request) {
@@ -42,11 +33,8 @@ public class IeTaskController {
 
     @ApiOperation("导出、导入生成任务")
     @PostMapping("add")
+    @Idempotent(prefix = RedisKey.TASK_REQUEST_ID)
     public ResponseWrapper<IeTaskListBean> addTask(@RequestBody @Valid IeTaskAddRequest request) {
-        // TODO 改成AOP
-        String requestId = IdempotencyHandlerUtil.generateRequestId(JSON.toJSONString(request));
-        Assert.isFalse(redisTemplate.hasKey(RedisKey.TASK_REQUEST_ID + requestId),()->new ServiceException("操作过于频繁，请稍后！"));
-        redisTemplate.opsForValue().set(RedisKey.TASK_REQUEST_ID + requestId,requestId,30, TimeUnit.SECONDS);
         ResponseWrapper<IeTaskListBean> response = taskService.addTask(request);
         return response;
     }

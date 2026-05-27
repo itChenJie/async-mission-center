@@ -8,13 +8,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @Description
- *  幂等性处理
+ * @Description 幂等性处理
  **/
 public class IdempotencyHandlerUtil {
 
     /**
-     * 对字符串转换成md5 处理 接口短时间内重复点击幂等性文档
+     * 对字符串转换成md5
      * @param params
      * @return
      */

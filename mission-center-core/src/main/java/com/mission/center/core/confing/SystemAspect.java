@@ -79,11 +79,11 @@ public class SystemAspect {
 			}
 			if(e instanceof ServiceException) {
 				ServiceException se = (ServiceException)e;
-				((ResponseWrapper)response).fail(se.getCode(),se.getMessage());
+                ((ResponseWrapper<?>)response).build(se.getCode(),se.getMessage());
 			} else if (e instanceof IllegalArgumentException) {
-				((ResponseWrapper)response).fail(ServerCode.PARAM_ERROR.getCode(),e.getMessage());
+				((ResponseWrapper<?>)response).build(ServerCode.PARAM_ERROR.getCode(),e.getMessage());
 			} else {
-				((ResponseWrapper)response).fail(ServerCode.SYSTEM_ERROR.getCode(),ServerCode.SYSTEM_ERROR.getMsg());
+				((ResponseWrapper<?>)response).build(ServerCode.SYSTEM_ERROR.getCode(),ServerCode.SYSTEM_ERROR.getMsg());
 			}
 		}
 
