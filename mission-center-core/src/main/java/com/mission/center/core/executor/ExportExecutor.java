@@ -2,6 +2,7 @@ package com.mission.center.core.executor;
 
 import cn.hutool.core.lang.Assert;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.mission.center.constant.IeTaskState;
 import com.mission.center.constants.Constants;
@@ -73,6 +74,7 @@ public class ExportExecutor extends Thread {
             iIeTaskService.updateState(context.getTaskCode(), new UpdateStateBean(IeTaskState.EXECUTING,null,"当前导出模版暂不支持！"));
             return;
         }
+        String path = null;
         try {
             iIeTaskService.updateTempFileSaveIp(context.getTaskCode(), IpUtils.localIP());
 
@@ -82,6 +84,7 @@ public class ExportExecutor extends Thread {
             fileService.createOrReplaceFile(filePath);
             File file = new File(filePath);
             iIeTaskService.updateFileName(context.getTaskCode(),fileName);
+            path = file.getPath();
             try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(file.toPath()))) {
                 context.setOut(out);
                 boolean execute = downloadTemplate.execute(context);
@@ -89,7 +92,6 @@ public class ExportExecutor extends Thread {
                     String ossKey = fileService.upload(fileName);
                     iIeTaskService.updateFileRemoteAddress(ossKey, context.getTaskCode());
                     iIeTaskService.updateState(context.getTaskCode(), new UpdateStateBean(IeTaskState.SUCCESS));
-                    fileService.deleteTempFile(file.getPath());
                 }
             }catch (Exception e){
                 log.error("数据导出异常",e);
@@ -98,6 +100,9 @@ public class ExportExecutor extends Thread {
         }catch (Exception e){
             log.error("数据导出 文件处理异常",e);
             iIeTaskService.updateState(context.getTaskCode(), new UpdateStateBean(IeTaskState.FAIL, null, e.getMessage()));
+            if (!StrUtil.isEmpty(path)) {
+                fileService.deleteTempFile(path);
+            }
         }
 
     }

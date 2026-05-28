@@ -35,7 +35,7 @@ public abstract class AbstractCleanseTemplate<T> extends AbstractCommonTemplate 
             log.info("pageTotal-------------------:{}",pageTotal);
             log.info("TaskRequestContext-------------------:{}",context);
             if (pageTotal.getTotal() <= 0) {
-                complete(context.getTaskCode(), 0l, 0l);
+                complete(context.getTaskCode(), 0L, 0L);
                 return true;
             }
             updateTotal(context.getTaskCode(),pageTotal.getTotal());
@@ -43,8 +43,8 @@ public abstract class AbstractCleanseTemplate<T> extends AbstractCommonTemplate 
             int totalPage = PageUtil.totalPage(pageTotal.getTotal(), pageTotal.getPageSize());
             Page page = new Page(1, pageTotal.getPageSize(), pageTotal.getTotal());
             Long cursorId = 0L;
-            Long successNumber = 0l;
-            Long failNumber = 0l;
+            Long successNumber = 0L;
+            Long failNumber = 0L;
             Integer currentPageInIndex = context.getCurrentPageInIndex();
             boolean isFirst = true;
             // 任务再次开启 从上次处理的位置开始
